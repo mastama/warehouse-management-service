@@ -14,9 +14,10 @@ public enum ResponseCode {
     DATA_NOT_FOUND("014", "Data tidak ditemukan", HttpStatus.NOT_FOUND),
     DATA_EXISTS   ("017", "Data sudah ada",       HttpStatus.CONFLICT),
     WRONG_DATA_FMT("030", "Format Data Salah",    HttpStatus.BAD_REQUEST),
-    GENERAL_ERROR ("098", "General Error",        HttpStatus.INTERNAL_SERVER_ERROR);
+    GENERAL_ERROR ("098", "General Error",        HttpStatus.INTERNAL_SERVER_ERROR),
+    OUT_OF_STOCK  ("031", "Stok tidak cukup",     HttpStatus.BAD_REQUEST);
 
     private final String code;
-    private final String description;  // deskripsi default
+    private final String description;
     private final HttpStatus httpStatus;
 }

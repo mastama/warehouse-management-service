@@ -57,6 +57,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ResponseCode.WRONG_DATA_FMT.getHttpStatus()).body(body);
     }
 
+    // 400: out of stock / invalid state dari service
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse> handleIllegalState(IllegalStateException ex) {
+        // respons 400 + desc = pesan dari service, data: null
+        ApiResponse body = ResponseUtil.build(ResponseCode.OUT_OF_STOCK, serviceId, ex.getMessage(), null);
+        return ResponseEntity.status(ResponseCode.OUT_OF_STOCK.getHttpStatus()).body(body);
+    }
+
     // === 404
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiResponse> handleNotFound(EntityNotFoundException ex) {

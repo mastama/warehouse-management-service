@@ -22,5 +22,7 @@ public class ApiResponse implements Serializable {
 
     private String responseCode;
     private String responseDesc;
+
+    @JsonInclude(JsonInclude.Include.ALWAYS)
     private Object data;
 }
