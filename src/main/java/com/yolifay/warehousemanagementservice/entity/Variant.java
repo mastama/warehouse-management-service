@@ -3,6 +3,7 @@ package com.yolifay.warehousemanagementservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -12,6 +13,8 @@ import java.util.UUID;
         uniqueConstraints = @UniqueConstraint(name="uk_item_sku", columnNames={"item_id","sku"}))
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Variant implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 443054632837996807L;
     @Id
     @GeneratedValue
     private UUID id;

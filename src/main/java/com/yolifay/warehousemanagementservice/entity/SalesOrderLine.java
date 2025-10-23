@@ -3,6 +3,7 @@ package com.yolifay.warehousemanagementservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import java.util.UUID;
 @Table(name="sales_order_lines")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class SalesOrderLine implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 31683173206235429L;
     @Id
     @GeneratedValue
     private UUID id;

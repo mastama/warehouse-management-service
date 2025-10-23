@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @Table(name="sales_orders")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class SalesOrder implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -1535435830767933550L;
     @Id
     @GeneratedValue
     private UUID id;

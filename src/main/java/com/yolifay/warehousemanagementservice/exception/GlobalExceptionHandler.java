@@ -1,59 +1,106 @@
 package com.yolifay.warehousemanagementservice.exception;
 
+import com.yolifay.warehousemanagementservice.dto.ApiResponse;
+import com.yolifay.warehousemanagementservice.util.ResponseCode;
+import com.yolifay.warehousemanagementservice.util.ResponseUtil;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.Data;
-import org.springframework.http.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
+import java.util.Optional;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiError> handleNotFound(EntityNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiError.of(HttpStatus.NOT_FOUND, ex.getMessage()));
+    /** 4 digit supaya format 3+4+3 pas (contoh: 0000). */
+    @Value("${service.id}")
+    private String serviceId;
+
+    // === 409: constraint/duplicate dari DB
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ApiResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
+        // Coba ambil nilai (opsional) dari pesan untuk di-append
+        ex.getMostSpecificCause();
+        String value = extractValue(ex.getMostSpecificCause().getMessage());
+        String desc = appendValue(ResponseCode.DATA_EXISTS.getDescription(), value);
+        ApiResponse body = ResponseUtil.build(ResponseCode.DATA_EXISTS, serviceId, desc, null);
+        return ResponseEntity.status(ResponseCode.DATA_EXISTS.getHttpStatus()).body(body);
     }
 
-    @ExceptionHandler({ IllegalArgumentException.class, IllegalStateException.class })
-    public ResponseEntity<ApiError> handleBadRequest(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiError.of(HttpStatus.BAD_REQUEST, ex.getMessage()));
+    // === 400 vs 409: IllegalArgumentException – kalau mengandung "exist/duplicate/unique/already" → 409, selain itu 400
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse> handleIllegalArg(IllegalArgumentException ex) {
+        String msg = Optional.ofNullable(ex.getMessage()).orElse("");
+        if (looksLikeConflict(msg)) {
+            String value = extractValue(msg);
+            String desc = appendValue(ResponseCode.DATA_EXISTS.getDescription(), value);
+            ApiResponse body = ResponseUtil.build(ResponseCode.DATA_EXISTS, serviceId, desc, null);
+            return ResponseEntity.status(ResponseCode.DATA_EXISTS.getHttpStatus()).body(body);
+        }
+        ApiResponse body = ResponseUtil.build(ResponseCode.WRONG_DATA_FMT, serviceId, msg, null);
+        return ResponseEntity.status(ResponseCode.WRONG_DATA_FMT.getHttpStatus()).body(body);
     }
 
+    // === 400: @Valid body – pakai pesan field pertama saja, data=null
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidation(MethodArgumentNotValidException ex) {
-        String msg = ex.getBindingResult().getFieldErrors().stream()
-                .map(fe -> fe.getField() + " " + fe.getDefaultMessage())
-                .findFirst().orElse("Validation error");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiError.of(HttpStatus.BAD_REQUEST, msg));
+    public ResponseEntity<ApiResponse> handleMethodArgNotValid(MethodArgumentNotValidException ex) {
+        String firstMsg = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + " " + Optional.ofNullable(fe.getDefaultMessage()).orElse("Invalid"))
+                .findFirst().orElse("Validation failed");
+        ApiResponse body = ResponseUtil.build(ResponseCode.WRONG_DATA_FMT, serviceId, firstMsg, null);
+        return ResponseEntity.status(ResponseCode.WRONG_DATA_FMT.getHttpStatus()).body(body);
     }
 
+    // === 404
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ApiResponse> handleNotFound(EntityNotFoundException ex) {
+        ApiResponse body = ResponseUtil.build(ResponseCode.DATA_NOT_FOUND, serviceId, ex.getMessage(), null);
+        return ResponseEntity.status(ResponseCode.DATA_NOT_FOUND.getHttpStatus()).body(body);
+    }
+
+    // === 405
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse> handleMethodNotSupported(HttpRequestMethodNotSupportedException ex) {
+        ApiResponse body = ResponseUtil.build(ResponseCode.WRONG_DATA_FMT, serviceId, "HTTP method not supported", null);
+        return ResponseEntity.status(ResponseCode.WRONG_DATA_FMT.getHttpStatus()).body(body);
+    }
+
+    // === 500 fallback
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleOthers(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiError.of(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage()));
+    public ResponseEntity<ApiResponse> handleOthers(Exception ex) {
+        log.error("Unhandled exception", ex);
+        ApiResponse body = ResponseUtil.build(ResponseCode.GENERAL_ERROR, serviceId, "Internal server error", null);
+        return ResponseEntity.status(ResponseCode.GENERAL_ERROR.getHttpStatus()).body(body);
     }
 
-    @Data
-    public static class ApiError {
-        private final Instant timestamp = Instant.now();
-        private final int status;
-        private final String error;
-        private final String message;
+    /* ---------------- helpers ---------------- */
 
-        public static ApiError of(HttpStatus status, String message) {
-            return new ApiError(status.value(), status.getReasonPhrase(), message);
-        }
+    private static boolean looksLikeConflict(String msg) {
+        String s = msg == null ? "" : msg.toLowerCase();
+        return s.contains("exist") || s.contains("already") || s.contains("duplicate") || s.contains("unique");
+    }
 
-        private ApiError(int status, String error, String message) {
-            this.status = status;
-            this.error = error;
-            this.message = message;
+    /** Ambil value yang mau ditampilkan. Ubah seperlunya sesuai pola pesan exception di project-mu. */
+    private static String extractValue(String message) {
+        if (message == null || message.isBlank()) return null;
+        int idx = message.indexOf(':');
+        if (idx >= 0 && idx + 1 < message.length()) {
+            return message.substring(idx + 1).trim();
         }
+        if (message.contains("=")) {
+            String[] parts = message.split("=", 2);
+            return parts.length == 2 ? parts[1].trim() : message.trim();
+        }
+        return message.trim();
+    }
+
+    private static String appendValue(String baseDesc, String value) {
+        return (value == null || value.isBlank()) ? baseDesc : baseDesc + " : " + value;
     }
 }
-

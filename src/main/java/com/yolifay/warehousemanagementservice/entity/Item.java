@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -13,6 +14,8 @@ import java.util.UUID;
 @Table(name = "items")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Item implements Serializable {
+    @Serial
+    private static final long serialVersionUID = -8046662315514642257L;
     @Id
     @GeneratedValue
     private UUID id;

@@ -6,6 +6,8 @@ import com.yolifay.warehousemanagementservice.entity.SalesOrder;
 import com.yolifay.warehousemanagementservice.entity.SalesOrderLine;
 import com.yolifay.warehousemanagementservice.entity.Variant;
 
+import com.yolifay.warehousemanagementservice.util.ResponseCode;
+import com.yolifay.warehousemanagementservice.util.ResponseUtil;
 import org.springframework.aop.SpringProxy;
 import org.springframework.aop.framework.Advised;
 import org.springframework.core.DecoratingProxy;
@@ -32,7 +34,11 @@ public class ApplicationRuntimeHints implements RuntimeHintsRegistrar {
                 VariantCreateRequest.class, VariantUpdateRequest.class, VariantResponse.class,
                 StockSetRequest.class,
                 OrderCreateRequest.class, OrderLineRequest.class,
-                OrderResponse.class, OrderResponse.Line.class
+                OrderResponse.class, OrderResponse.Line.class,
+                ApiResponse.class,
+
+                // Utils
+                ResponseCode.class, ResponseUtil.class
         );
 
         reflectiveTypes.forEach(type ->

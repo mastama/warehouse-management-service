@@ -17,6 +17,8 @@
   }, {
     "pattern":"\\QMETA-INF/services/jakarta.el.ExpressionFactory\\E"
   }, {
+    "pattern":"\\QMETA-INF/services/jakarta.persistence.spi.PersistenceProvider\\E"
+  }, {
     "pattern":"\\QMETA-INF/services/jakarta.validation.ConstraintValidator\\E"
   }, {
     "pattern":"\\QMETA-INF/services/jakarta.validation.spi.ValidationProvider\\E"
@@ -121,6 +123,8 @@
   }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/config/ApplicationConfig.class\\E"
   }, {
+    "pattern":"\\Qcom/yolifay/warehousemanagementservice/controller/ItemController.class\\E"
+  }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/entity/Item.class\\E"
   }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/entity/SalesOrder.class\\E"
@@ -129,6 +133,10 @@
   }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/entity/Variant.class\\E"
   }, {
+    "pattern":"\\Qcom/yolifay/warehousemanagementservice/exception/GlobalExceptionHandler$ApiError.class\\E"
+  }, {
+    "pattern":"\\Qcom/yolifay/warehousemanagementservice/exception/GlobalExceptionHandler.class\\E"
+  }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/repository/ItemRepository.class\\E"
   }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/repository/SalesOrderLineRepository.class\\E"
@@ -136,6 +144,8 @@
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/repository/SalesOrderRepository.class\\E"
   }, {
     "pattern":"\\Qcom/yolifay/warehousemanagementservice/repository/VariantRepository.class\\E"
+  }, {
+    "pattern":"\\Qcom/yolifay/warehousemanagementservice/service/ItemService.class\\E"
   }, {
     "pattern":"\\Qconfig/application-default.properties\\E"
   }, {
@@ -228,6 +238,8 @@
     "pattern":"\\Qorg/postgresql/driverconfig.properties\\E"
   }, {
     "pattern":"\\Qorg/springframework/aot/hint/RuntimeHintsRegistrar.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/aot/hint/annotation/Reflective.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/beans/factory/Aware.class\\E"
   }, {
@@ -673,6 +685,18 @@
   }, {
     "pattern":"\\Qorg/springframework/transaction/annotation/TransactionManagementConfigurationSelector.class\\E"
   }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/ControllerAdvice.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/Mapping.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/RequestMapping.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/ResponseBody.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/RestController.class\\E"
+  }, {
+    "pattern":"\\Qorg/springframework/web/bind/annotation/RestControllerAdvice.class\\E"
+  }, {
     "pattern":"\\Qorg/springframework/web/context/ServletContextAware.class\\E"
   }, {
     "pattern":"\\Qorg/springframework/web/servlet/config/annotation/DelegatingWebMvcConfiguration.class\\E"
@@ -696,10 +720,16 @@
     "pattern":"\\Qstatic/index.html\\E"
   }]},
   "bundles":[{
+    "name":"jakarta.servlet.LocalStrings",
+    "locales":[""]
+  }, {
     "name":"jakarta.servlet.http.LocalStrings",
     "locales":[""]
   }, {
     "name":"org.apache.catalina.authenticator.LocalStrings",
+    "locales":[""]
+  }, {
+    "name":"org.apache.catalina.authenticator.jaspic.LocalStrings",
     "locales":[""]
   }, {
     "name":"org.apache.catalina.connector.LocalStrings",
@@ -745,6 +775,9 @@
     "locales":[""]
   }, {
     "name":"org.apache.coyote.http11.LocalStrings",
+    "locales":[""]
+  }, {
+    "name":"org.apache.coyote.http11.filters.LocalStrings",
     "locales":[""]
   }, {
     "name":"org.apache.naming.LocalStrings",
